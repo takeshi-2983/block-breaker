@@ -182,11 +182,75 @@ function drawBricks() {
     });
 }
 
+// Draw ball trajectory preview
+function drawTrajectory() {
+    const steps = 300;
+    const points = [];
+    let tx = ball.x;
+    let ty = ball.y;
+    let tdx = ball.dx;
+    let tdy = ball.dy;
+
+    for (let i = 0; i < steps; i++) {
+        tx += tdx;
+        ty += tdy;
+
+        // Wall collisions
+        if (tx - ball.radius < 0) {
+            tdx = Math.abs(tdx);
+            tx = ball.radius;
+        } else if (tx + ball.radius > canvas.width) {
+            tdx = -Math.abs(tdx);
+            tx = canvas.width - ball.radius;
+        }
+        if (ty - ball.radius < 0) {
+            tdy = Math.abs(tdy);
+            ty = ball.radius;
+        }
+
+        // Stop if out of bottom
+        if (ty + ball.radius > canvas.height) break;
+
+        // Brick collision
+        let hitBrick = false;
+        for (const brick of bricks) {
+            if (brick.active &&
+                tx > brick.x && tx < brick.x + brick.width &&
+                ty > brick.y && ty < brick.y + brick.height) {
+                hitBrick = true;
+                break;
+            }
+        }
+        if (hitBrick) break;
+
+        points.push({ x: tx, y: ty });
+    }
+
+    if (points.length < 2) return;
+
+    ctx.save();
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(102, 126, 234, 0.5)';
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.stroke();
+    ctx.restore();
+}
+
 function draw() {
     // Clear canvas
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
+    // Draw trajectory preview when not running or paused
+    if (!gameRunning || gamePaused) {
+        drawTrajectory();
+    }
+
     // Draw game elements
     drawPaddle();
     drawBall();
