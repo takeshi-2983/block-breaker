@@ -40,6 +40,10 @@ const brickConfig = {
     offsetY: 30
 };
 
+// Button control state
+let buttonLeftPressed = false;
+let buttonRightPressed = false;
+
 // Keyboard input
 const keys = {};
 window.addEventListener('keydown', (e) => {
@@ -88,6 +92,8 @@ const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
 const restartBtn = document.getElementById('restartBtn');
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
 const gameOverModal = document.getElementById('gameOver');
 const scoreDisplay = document.getElementById('score');
 const livesDisplay = document.getElementById('lives');
@@ -102,6 +108,44 @@ restartBtn.addEventListener('click', () => {
     gameOverModal.classList.add('hidden');
     resetGame();
     startGame();
+});
+
+// Left button controls
+leftBtn.addEventListener('mousedown', () => {
+    buttonLeftPressed = true;
+});
+leftBtn.addEventListener('mouseup', () => {
+    buttonLeftPressed = false;
+});
+leftBtn.addEventListener('mouseleave', () => {
+    buttonLeftPressed = false;
+});
+leftBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    buttonLeftPressed = true;
+});
+leftBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    buttonLeftPressed = false;
+});
+
+// Right button controls
+rightBtn.addEventListener('mousedown', () => {
+    buttonRightPressed = true;
+});
+rightBtn.addEventListener('mouseup', () => {
+    buttonRightPressed = false;
+});
+rightBtn.addEventListener('mouseleave', () => {
+    buttonRightPressed = false;
+});
+rightBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    buttonRightPressed = true;
+});
+rightBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    buttonRightPressed = false;
 });
 
 // Initialize bricks
@@ -158,6 +202,8 @@ function resetGame() {
     ball.dx = 4;
     ball.dy = -4;
     paddle.x = canvas.width / 2 - 50;
+    buttonLeftPressed = false;
+    buttonRightPressed = false;
     
     initBricks();
     updateUI();
@@ -294,6 +340,14 @@ function checkCollisions() {
 // Update game state
 function update() {
     if (!gameRunning || gamePaused) return;
+    
+    // Handle button-based paddle movement
+    if (buttonLeftPressed) {
+        paddle.x = Math.max(0, paddle.x - paddle.speed);
+    }
+    if (buttonRightPressed) {
+        paddle.x = Math.min(canvas.width - paddle.width, paddle.x + paddle.speed);
+    }
     
     // Update ball position
     ball.x += ball.dx;
