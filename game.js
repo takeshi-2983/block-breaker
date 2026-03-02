@@ -58,6 +58,31 @@ canvas.addEventListener('mousemove', (e) => {
     paddle.x = Math.max(0, Math.min(mouseX - paddle.width / 2, canvas.width - paddle.width));
 });
 
+// Touch tracking for paddle (mobile support)
+canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault(); // Prevent scrolling while playing
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const touchX = touch.clientX - rect.left;
+    paddle.x = Math.max(0, Math.min(touchX - paddle.width / 2, canvas.width - paddle.width));
+}, { passive: false });
+
+// Prevent default touch behaviors on the canvas
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+// Prevent scrolling on the entire page during gameplay
+window.addEventListener('touchmove', (e) => {
+    if (gameRunning) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
 // UI Elements
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
@@ -299,7 +324,25 @@ function gameLoop() {
     }
 }
 
+// Responsive canvas sizing
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const maxWidth = Math.min(window.innerWidth - 40, 800);
+    const maxHeight = Math.min(window.innerHeight - 300, 600);
+    const scale = Math.min(maxWidth / 800, maxHeight / 600, 1);
+    
+    canvas.style.width = (800 * scale) + 'px';
+    canvas.style.height = (600 * scale) + 'px';
+}
+
+// Handle window resize
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 100);
+});
+
 // Initialize game
+resizeCanvas();
 initBricks();
 updateUI();
 draw();
