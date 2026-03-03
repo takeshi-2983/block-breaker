@@ -61,6 +61,16 @@ h1 {
     font-size: 1em;
 }
 
+.high-score {
+    color: #ffaa00;
+    text-shadow: 0 0 5px #ffaa00;
+    padding: 8px 15px;
+    border: 1px solid #ffaa00;
+    border-radius: 5px;
+    background: rgba(255, 170, 0, 0.05);
+    font-weight: bold;
+}
+
 #gameCanvas {
     display: block;
     margin: 0 auto 20px;
@@ -196,9 +206,16 @@ h1 {
 .modal-content p {
     font-size: 1.5em;
     color: #ffff00;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     font-weight: bold;
     text-shadow: 0 0 5px #ffff00;
+}
+
+.modal-content .high-score-line {
+    font-size: 1.1em;
+    color: #ffaa00;
+    text-shadow: 0 0 5px #ffaa00;
+    margin-bottom: 25px;
 }
 
 .modal-content .btn {
@@ -280,7 +297,7 @@ h1 {
         gap: 8px;
     }
 
-    .stage, .score, .lives {
+    .stage, .score, .lives, .high-score {
         padding: 6px 12px;
         font-size: 0.9em;
     }
