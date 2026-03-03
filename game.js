@@ -9,6 +9,7 @@ let score = 0;
 let lives = 3;
 let currentStage = 1;
 const maxStages = 5;
+let gameTime = 0;
 
 // Stage configuration
 const stageConfig = {
@@ -19,14 +20,15 @@ const stageConfig = {
     5: { rows: 6, cols: 10, ballSpeed: 6, paddleWidth: 75 }
 };
 
-// Paddle
+// Paddle (Neon Creature)
 const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     width: 100,
     height: 15,
     speed: 7,
-    dx: 0
+    dx: 0,
+    lastBallHit: 0
 };
 
 // Ball
@@ -75,7 +77,7 @@ canvas.addEventListener('mousemove', (e) => {
 
 // Touch tracking for paddle (mobile support)
 canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault(); // Prevent scrolling while playing
+    e.preventDefault();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     const touchX = touch.clientX - rect.left;
@@ -166,7 +168,6 @@ function initBricks() {
     const config = stageConfig[currentStage];
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#FFD93D', '#6BCB77'];
     
-    // Adjust brick configuration based on stage
     const brickWidth = Math.max(60, 90 - (currentStage - 1) * 3);
     const brickHeight = 20;
     const padding = 5;
@@ -194,14 +195,11 @@ function initBricks() {
 function applyStageSettings() {
     const config = stageConfig[currentStage];
     
-    // Update paddle width
     paddle.width = config.paddleWidth;
     paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
     
-    // Update ball speed
     ball.speed = config.ballSpeed;
     
-    // Reinitialize bricks for new stage
     initBricks();
 }
 
@@ -210,6 +208,7 @@ function startGame() {
     if (!gameRunning) {
         gameRunning = true;
         gamePaused = false;
+        gameTime = 0;
         startBtn.disabled = true;
         pauseBtn.disabled = false;
         gameLoop();
@@ -234,12 +233,14 @@ function resetGame() {
     score = 0;
     lives = 3;
     currentStage = 1;
+    gameTime = 0;
     ball.x = canvas.width / 2;
     ball.y = canvas.height - 40;
     ball.dx = 4;
     ball.dy = -4;
     paddle.x = canvas.width / 2 - 50;
     paddle.width = 100;
+    paddle.lastBallHit = 0;
     ball.speed = 5;
     buttonLeftPressed = false;
     buttonRightPressed = false;
@@ -264,17 +265,64 @@ function updateUI() {
 
 // Draw functions
 function drawPaddle() {
+    const centerX = paddle.x + paddle.width / 2;
+    const centerY = paddle.y;
+    const time = gameTime * 0.05;
+    const breathe = Math.sin(time) * 2;
+    const hitReaction = Math.max(0, 1 - (gameTime - paddle.lastBallHit) * 0.1);
+    
     ctx.shadowColor = '#00ff88';
-    ctx.shadowBlur = 15;
+    ctx.shadowBlur = 15 + hitReaction * 10;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
     
+    // Main body
     ctx.fillStyle = '#00ff88';
-    ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY + 2, paddle.width / 2 - 2, 8 + breathe, 0, 0, Math.PI * 2);
+    ctx.fill();
     
+    // Left fin
+    ctx.beginPath();
+    ctx.ellipse(centerX - paddle.width / 3, centerY - 2 + Math.sin(time + 1) * 3, 8, 12, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Right fin
+    ctx.beginPath();
+    ctx.ellipse(centerX + paddle.width / 3, centerY - 2 + Math.sin(time) * 3, 8, 12, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Tail
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY + 10 + Math.sin(time * 1.5) * 2, 5, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Eyes
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    ctx.arc(centerX - 15, centerY - 2, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(centerX + 15, centerY - 2, 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Eye glow
+    ctx.shadowColor = '#ffff00';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(centerX - 15, centerY - 2, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(centerX + 15, centerY - 2, 1, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Outline
     ctx.strokeStyle = '#00ff88';
     ctx.lineWidth = 2;
-    ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    ctx.beginPath();
+    ctx.ellipse(centerX, centerY + 2, paddle.width / 2 - 2, 8 + breathe, 0, 0, Math.PI * 2);
+    ctx.stroke();
     
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
@@ -340,6 +388,7 @@ function checkCollisions() {
         ball.dy = -Math.abs(ball.dy);
         const hitPos = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
         ball.dx = hitPos * ball.speed;
+        paddle.lastBallHit = gameTime;
     }
     
     // Ball-wall collision
@@ -365,7 +414,6 @@ function checkCollisions() {
             score += 10;
             updateUI();
             
-            // Determine collision side
             const overlapLeft = (ball.x + ball.radius) - brick.x;
             const overlapRight = (brick.x + brick.width) - (ball.x - ball.radius);
             const overlapTop = (ball.y + ball.radius) - brick.y;
@@ -396,14 +444,12 @@ function checkCollisions() {
         }
     }
     
-    // Check win condition (all bricks destroyed)
+    // Check win condition
     if (bricks.every(brick => !brick.active)) {
         if (currentStage < maxStages) {
-            // Move to next stage
             currentStage++;
             applyStageSettings();
             
-            // Reset ball and paddle for next stage
             ball.x = canvas.width / 2;
             ball.y = canvas.height - 40;
             ball.dx = 4;
@@ -413,14 +459,12 @@ function checkCollisions() {
             updateUI();
             draw();
             
-            // Pause briefly before continuing
             gameRunning = false;
             setTimeout(() => {
                 gameRunning = true;
                 gameLoop();
             }, 1500);
         } else {
-            // All stages cleared!
             endGame(true);
         }
     }
@@ -430,7 +474,8 @@ function checkCollisions() {
 function update() {
     if (!gameRunning || gamePaused) return;
     
-    // Handle button-based paddle movement
+    gameTime++;
+    
     if (buttonLeftPressed) {
         paddle.x = Math.max(0, paddle.x - paddle.speed);
     }
@@ -438,11 +483,9 @@ function update() {
         paddle.x = Math.min(canvas.width - paddle.width, paddle.x + paddle.speed);
     }
     
-    // Update ball position
     ball.x += ball.dx;
     ball.y += ball.dy;
     
-    // Check collisions
     checkCollisions();
 }
 
