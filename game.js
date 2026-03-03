@@ -7,6 +7,17 @@ let gameRunning = false;
 let gamePaused = false;
 let score = 0;
 let lives = 3;
+let currentStage = 1;
+const maxStages = 5;
+
+// Stage configuration
+const stageConfig = {
+    1: { rows: 4, cols: 8, ballSpeed: 4, paddleWidth: 100 },
+    2: { rows: 5, cols: 8, ballSpeed: 4.5, paddleWidth: 90 },
+    3: { rows: 5, cols: 9, ballSpeed: 5, paddleWidth: 85 },
+    4: { rows: 6, cols: 9, ballSpeed: 5.5, paddleWidth: 80 },
+    5: { rows: 6, cols: 10, ballSpeed: 6, paddleWidth: 75 }
+};
 
 // Paddle
 const paddle = {
@@ -95,6 +106,7 @@ const restartBtn = document.getElementById('restartBtn');
 const leftBtn = document.getElementById('leftBtn');
 const rightBtn = document.getElementById('rightBtn');
 const gameOverModal = document.getElementById('gameOver');
+const stageDisplay = document.getElementById('stage');
 const scoreDisplay = document.getElementById('score');
 const livesDisplay = document.getElementById('lives');
 const finalScoreDisplay = document.getElementById('finalScore');
@@ -148,25 +160,49 @@ rightBtn.addEventListener('touchend', (e) => {
     buttonRightPressed = false;
 });
 
-// Initialize bricks
+// Initialize bricks based on current stage
 function initBricks() {
     bricks = [];
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A'];
+    const config = stageConfig[currentStage];
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#FFD93D', '#6BCB77'];
     
-    for (let row = 0; row < brickConfig.rows; row++) {
-        for (let col = 0; col < brickConfig.cols; col++) {
-            const x = col * (brickConfig.width + brickConfig.padding) + brickConfig.offsetX;
-            const y = row * (brickConfig.height + brickConfig.padding) + brickConfig.offsetY;
+    // Adjust brick configuration based on stage
+    const brickWidth = Math.max(60, 90 - (currentStage - 1) * 3);
+    const brickHeight = 20;
+    const padding = 5;
+    const totalWidth = config.cols * (brickWidth + padding);
+    const offsetX = (canvas.width - totalWidth) / 2;
+    const offsetY = 30;
+    
+    for (let row = 0; row < config.rows; row++) {
+        for (let col = 0; col < config.cols; col++) {
+            const x = col * (brickWidth + padding) + offsetX;
+            const y = row * (brickHeight + padding) + offsetY;
             bricks.push({
                 x: x,
                 y: y,
-                width: brickConfig.width,
-                height: brickConfig.height,
+                width: brickWidth,
+                height: brickHeight,
                 active: true,
                 color: colors[row % colors.length]
             });
         }
     }
+}
+
+// Apply stage settings
+function applyStageSettings() {
+    const config = stageConfig[currentStage];
+    
+    // Update paddle width
+    paddle.width = config.paddleWidth;
+    paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
+    
+    // Update ball speed
+    ball.speed = config.ballSpeed;
+    
+    // Reinitialize bricks for new stage
+    initBricks();
 }
 
 // Start game
@@ -197,15 +233,18 @@ function resetGame() {
     gamePaused = false;
     score = 0;
     lives = 3;
+    currentStage = 1;
     ball.x = canvas.width / 2;
     ball.y = canvas.height - 40;
     ball.dx = 4;
     ball.dy = -4;
     paddle.x = canvas.width / 2 - 50;
+    paddle.width = 100;
+    ball.speed = 5;
     buttonLeftPressed = false;
     buttonRightPressed = false;
     
-    initBricks();
+    applyStageSettings();
     updateUI();
     
     startBtn.disabled = false;
@@ -218,6 +257,7 @@ function resetGame() {
 
 // Update UI
 function updateUI() {
+    stageDisplay.textContent = currentStage;
     scoreDisplay.textContent = score;
     livesDisplay.textContent = lives;
 }
@@ -331,9 +371,33 @@ function checkCollisions() {
         }
     }
     
-    // Check win condition
+    // Check win condition (all bricks destroyed)
     if (bricks.every(brick => !brick.active)) {
-        endGame(true);
+        if (currentStage < maxStages) {
+            // Move to next stage
+            currentStage++;
+            applyStageSettings();
+            
+            // Reset ball and paddle for next stage
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height - 40;
+            ball.dx = 4;
+            ball.dy = -4;
+            paddle.x = canvas.width / 2 - paddle.width / 2;
+            
+            updateUI();
+            draw();
+            
+            // Pause briefly before continuing
+            gameRunning = false;
+            setTimeout(() => {
+                gameRunning = true;
+                gameLoop();
+            }, 1500);
+        } else {
+            // All stages cleared!
+            endGame(true);
+        }
     }
 }
 
@@ -363,7 +427,11 @@ function endGame(won) {
     pauseBtn.disabled = true;
     startBtn.disabled = false;
     
-    gameOverTitle.textContent = won ? 'クリア！' : 'ゲームオーバー';
+    if (won) {
+        gameOverTitle.textContent = 'すべてのステージをクリア！';
+    } else {
+        gameOverTitle.textContent = 'ゲームオーバー';
+    }
     finalScoreDisplay.textContent = score;
     gameOverModal.classList.remove('hidden');
 }
@@ -397,6 +465,6 @@ window.addEventListener('orientationchange', () => {
 
 // Initialize game
 resizeCanvas();
-initBricks();
+applyStageSettings();
 updateUI();
 draw();

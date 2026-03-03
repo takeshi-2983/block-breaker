@@ -43,8 +43,12 @@ h1 {
     font-weight: bold;
 }
 
-.score, .lives {
+.stage, .score, .lives {
     color: #667eea;
+}
+
+.stage {
+    font-size: 1.1em;
 }
 
 #gameCanvas {
