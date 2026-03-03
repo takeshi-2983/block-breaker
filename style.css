@@ -5,8 +5,8 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0f0f2e 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -16,47 +16,57 @@ body {
     user-select: none;
     -webkit-touch-callout: none;
     touch-action: manipulation;
+    color: #00ff88;
 }
 
 .container {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    background: rgba(15, 15, 46, 0.8);
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.1);
     padding: 30px;
     max-width: 900px;
     width: 100%;
+    backdrop-filter: blur(10px);
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #00ff88;
     margin-bottom: 20px;
     font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+    letter-spacing: 3px;
+    font-weight: bold;
 }
 
 .game-info {
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: bold;
 }
 
 .stage, .score, .lives {
-    color: #667eea;
+    color: #00ff88;
+    text-shadow: 0 0 5px #00ff88;
+    padding: 8px 15px;
+    border: 1px solid #00ff88;
+    border-radius: 5px;
+    background: rgba(0, 255, 136, 0.05);
 }
 
 .stage {
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 #gameCanvas {
     display: block;
     margin: 0 auto 20px;
-    border: 3px solid #667eea;
-    border-radius: 5px;
-    background: #f0f0f0;
+    border: 3px solid #00ff88;
+    border-radius: 10px;
+    background: #000000;
     cursor: none;
     max-width: 100%;
     height: auto;
@@ -64,6 +74,7 @@ h1 {
     user-select: none;
     -webkit-touch-callout: none;
     touch-action: none;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5), inset 0 0 20px rgba(0, 255, 136, 0.1);
 }
 
 .controls {
@@ -77,29 +88,34 @@ h1 {
     padding: 12px 24px;
     font-size: 1em;
     font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 5px;
+    color: #000000;
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    border: 2px solid #00ff88;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s ease;
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
     min-height: 44px;
     min-width: 44px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6), 0 5px 15px rgba(0, 255, 136, 0.3);
+    background: linear-gradient(135deg, #00ff88 0%, #00ff88 100%);
 }
 
 .btn:active:not(:disabled) {
-    transform: translateY(0);
+    transform: translateY(-1px);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }
 
 .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
@@ -114,27 +130,31 @@ h1 {
     padding: 15px 30px;
     font-size: 1.1em;
     font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
-    border: none;
+    color: #000000;
+    background: linear-gradient(135deg, #ff006e 0%, #ff0055 100%);
+    border: 2px solid #ff006e;
     border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: all 0.2s ease;
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
     min-height: 50px;
     min-width: 100px;
     flex: 1;
     max-width: 150px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(255, 0, 110, 0.3);
 }
 
 .movement-btn:active {
     transform: scale(0.95);
-    box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4) inset;
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.6), 0 3px 10px rgba(255, 0, 110, 0.4) inset;
 }
 
 .movement-btn:hover {
-    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 0 25px rgba(255, 0, 110, 0.6);
+    transform: translateY(-2px);
 }
 
 .modal {
@@ -143,11 +163,12 @@ h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(5px);
 }
 
 .modal.hidden {
@@ -155,24 +176,29 @@ h1 {
 }
 
 .modal-content {
-    background: white;
+    background: rgba(15, 15, 46, 0.95);
     padding: 40px;
-    border-radius: 10px;
+    border-radius: 15px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.1);
+    border: 2px solid #00ff88;
+    backdrop-filter: blur(10px);
 }
 
 .modal-content h2 {
     font-size: 2em;
-    color: #333;
+    color: #00ff88;
     margin-bottom: 20px;
+    text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+    letter-spacing: 2px;
 }
 
 .modal-content p {
     font-size: 1.5em;
-    color: #667eea;
+    color: #ffff00;
     margin-bottom: 30px;
     font-weight: bold;
+    text-shadow: 0 0 5px #ffff00;
 }
 
 .modal-content .btn {
@@ -183,16 +209,17 @@ h1 {
 @media (max-width: 900px) {
     .container {
         padding: 15px;
-        border-radius: 8px;
+        border-radius: 12px;
     }
 
     h1 {
         font-size: 1.8em;
         margin-bottom: 15px;
+        letter-spacing: 2px;
     }
 
     .game-info {
-        font-size: 1em;
+        font-size: 0.95em;
         margin-bottom: 15px;
     }
 
@@ -236,17 +263,26 @@ h1 {
 
     .container {
         padding: 12px;
-        border-radius: 6px;
+        border-radius: 10px;
+        border-width: 2px;
     }
 
     h1 {
         font-size: 1.5em;
         margin-bottom: 12px;
+        letter-spacing: 1.5px;
     }
 
     .game-info {
-        font-size: 0.9em;
+        font-size: 0.85em;
         margin-bottom: 12px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .stage, .score, .lives {
+        padding: 6px 12px;
+        font-size: 0.9em;
     }
 
     #gameCanvas {
@@ -280,11 +316,13 @@ h1 {
 
     .modal-content {
         padding: 30px 20px;
+        border-radius: 12px;
     }
 
     .modal-content h2 {
         font-size: 1.5em;
         margin-bottom: 15px;
+        letter-spacing: 1px;
     }
 
     .modal-content p {

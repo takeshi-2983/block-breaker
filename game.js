@@ -264,41 +264,66 @@ function updateUI() {
 
 // Draw functions
 function drawPaddle() {
-    ctx.fillStyle = '#667eea';
+    ctx.shadowColor = '#00ff88';
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    ctx.fillStyle = '#00ff88';
     ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-    ctx.strokeStyle = '#764ba2';
+    
+    ctx.strokeStyle = '#00ff88';
     ctx.lineWidth = 2;
     ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
 }
 
 function drawBall() {
-    ctx.fillStyle = '#FFD700';
+    ctx.shadowColor = '#ffff00';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    ctx.fillStyle = '#ffff00';
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#FFA500';
+    
+    ctx.strokeStyle = '#ffff00';
     ctx.lineWidth = 2;
     ctx.stroke();
+    
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
 }
 
 function drawBricks() {
     bricks.forEach(brick => {
         if (brick.active) {
+            ctx.shadowColor = brick.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
             ctx.fillStyle = brick.color;
             ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+            
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1;
             ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
         }
     });
 }
 
 function draw() {
-    // Clear canvas
-    ctx.fillStyle = '#f0f0f0';
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw game elements
     drawPaddle();
     drawBall();
     drawBricks();
