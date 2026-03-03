@@ -210,16 +210,16 @@ function createParticles(x, y, color, count = 12) {
 
 // Power-up type definitions
 const powerUpDefs = [
-    { type: 'wide',  color: '#00aaff', symbol: '⊕', label: 'WIDE' },
-    { type: 'life',  color: '#ff4466', symbol: '♥', label: 'LIFE' },
-    { type: 'slow',  color: '#aaffaa', symbol: '↓', label: 'SLOW' },
-    { type: 'fever', color: '#ffaa00', symbol: '★', label: 'FEVER' }
+    { type: 'wide',  color: '#00aaff', descJP: 'パドルが広がる！' },
+    { type: 'life',  color: '#ff4466', descJP: '残機＋１！' },
+    { type: 'slow',  color: '#aaffaa', descJP: 'ボール速度ダウン！' },
+    { type: 'fever', color: '#ffaa00', descJP: 'フィーバー！' }
 ];
 
 function spawnPowerUp(x, y) {
     if (Math.random() < 0.18) {
         const def = powerUpDefs[Math.floor(Math.random() * powerUpDefs.length)];
-        powerUps.push({ x, y, width: 36, height: 18, dy: 2.2, ...def });
+        powerUps.push({ x, y, width: 36, height: 18, dy: 2.2, descTimer: 180, ...def });
     }
 }
 
@@ -515,26 +515,122 @@ function drawParticles() {
     ctx.shadowBlur = 0;
 }
 
+function drawHeartShape(cx, cy, size) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + size * 0.35);
+    ctx.bezierCurveTo(cx - size * 0.7, cy - size * 0.1, cx - size * 0.7, cy - size * 0.6, cx, cy - size * 0.2);
+    ctx.bezierCurveTo(cx + size * 0.7, cy - size * 0.6, cx + size * 0.7, cy - size * 0.1, cx, cy + size * 0.35);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawStarShape(cx, cy, outerR, innerR) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+        const angle = (i * Math.PI) / 5 - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        if (i === 0) ctx.moveTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+        else ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
 function drawPowerUps() {
     powerUps.forEach(p => {
+        ctx.save();
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 18;
         ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.roundRect(p.x - p.width / 2, p.y - p.height / 2, p.width, p.height, 4);
-        ctx.fill();
 
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 11px Courier New';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(p.label, p.x, p.y);
+        switch (p.type) {
+            case 'wide': {
+                // Wide horizontal bar suggesting paddle expansion
+                ctx.beginPath();
+                ctx.roundRect(p.x - 22, p.y - 7, 44, 14, 7);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 10px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('◀  ▶', p.x, p.y);
+                break;
+            }
+            case 'life': {
+                // Heart shape
+                drawHeartShape(p.x, p.y, 15);
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y + 15 * 0.35);
+                ctx.bezierCurveTo(p.x - 15 * 0.7, p.y - 15 * 0.1, p.x - 15 * 0.7, p.y - 15 * 0.6, p.x, p.y - 15 * 0.2);
+                ctx.bezierCurveTo(p.x + 15 * 0.7, p.y - 15 * 0.6, p.x + 15 * 0.7, p.y - 15 * 0.1, p.x, p.y + 15 * 0.35);
+                ctx.closePath();
+                ctx.stroke();
+                break;
+            }
+            case 'slow': {
+                // Clock face indicating time/speed slowdown
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x, p.y - 7);
+                ctx.stroke();
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + 5, p.y + 3);
+                ctx.stroke();
+                break;
+            }
+            case 'fever': {
+                // 5-pointed star for fever mode
+                drawStarShape(p.x, p.y, 15, 6);
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('!', p.x, p.y);
+                break;
+            }
+        }
 
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
+        // Japanese description label shown when power-up first appears
+        if (p.descTimer > 0) {
+            const alpha = p.descTimer < 40 ? p.descTimer / 40 : 1;
+            ctx.globalAlpha = alpha;
+            ctx.font = 'bold 12px sans-serif';
+            const textWidth = ctx.measureText(p.descJP).width;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.roundRect(p.x - textWidth / 2 - 6, p.y - 38, textWidth + 12, 18, 9);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(p.descJP, p.x, p.y - 29);
+        }
+
+        ctx.restore();
     });
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
 }
 
 function drawComboAndFever() {
@@ -807,7 +903,10 @@ function update() {
     });
 
     // Update power-ups
-    powerUps.forEach(p => { p.y += p.dy; });
+    powerUps.forEach(p => {
+        p.y += p.dy;
+        if (p.descTimer > 0) p.descTimer--;
+    });
 
     // Update combo timer
     if (comboTimer > 0) {
