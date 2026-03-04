@@ -388,3 +388,75 @@ h1 {
     font-size: 0.8em;
     display: block;
 }
+
+/* Character Select Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .character-select {
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 20px 0;
+    }
+    
+    .character-option {
+        padding: 10px;
+    }
+    
+    .character-preview {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .character-option p {
+        font-size: 0.9em;
+        margin: 6px 0 2px 0;
+    }
+    
+    .character-desc {
+        font-size: 0.7em;
+    }
+}
+
+@media (max-width: 480px) {
+    .character-select {
+        max-width: 100vw;
+        max-height: 100vh;
+        padding: 20px 15px;
+    }
+    
+    .character-select h2 {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+    }
+    
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin: 15px 0;
+    }
+    
+    .character-option {
+        padding: 8px;
+        border-width: 1px;
+    }
+    
+    .character-preview {
+        width: 50px;
+        height: 50px;
+        border-width: 1px;
+    }
+    
+    .character-option p {
+        font-size: 0.8em;
+        margin: 4px 0 2px 0;
+    }
+    
+    .character-desc {
+        font-size: 0.65em;
+    }
+}

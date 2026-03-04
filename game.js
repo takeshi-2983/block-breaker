@@ -151,6 +151,7 @@ const leftBtn = document.getElementById('leftBtn');
 const rightBtn = document.getElementById('rightBtn');
 const gameOverModal = document.getElementById('gameOver');
 const characterSelectModal = document.getElementById('characterSelectModal');
+const startCharacterBtn = document.getElementById('startCharacterBtn');
 const stageDisplay = document.getElementById('stage');
 const scoreDisplay = document.getElementById('score');
 const livesDisplay = document.getElementById('lives');
@@ -164,13 +165,38 @@ document.querySelectorAll('.character-option').forEach(option => {
         option.classList.add('selected');
         selectedCharacter = option.dataset.character;
     });
+    option.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.character-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedCharacter = option.dataset.character;
+    });
 });
 
+// Start game from character selection
+if (startCharacterBtn) {
+    startCharacterBtn.addEventListener('click', () => {
+        startGame();
+    });
+    startCharacterBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        startGame();
+    });
+}
+
 // Event listeners
-startBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', () => {
+    showCharacterSelect();
+});
 pauseBtn.addEventListener('click', togglePause);
 resetBtn.addEventListener('click', resetGame);
 restartBtn.addEventListener('click', () => {
+    gameOverModal.classList.add('hidden');
+    resetGame();
+    showCharacterSelect();
+});
+restartBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
     gameOverModal.classList.add('hidden');
     resetGame();
     showCharacterSelect();
