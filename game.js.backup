@@ -376,49 +376,6 @@ function updateUI() {
 
 // Draw character
 function drawCharacter() {
-    const charProps = characters[selectedCharacter];
-    const charColor = charProps.color;
-    
-    let scaleFactor = 1;
-    if (gigantizeActive) {
-        scaleFactor = 1.5;
-    }
-    
-    // Draw character image if available
-    if (characterImages[selectedCharacter]) {
-        const img = characterImages[selectedCharacter];
-        const imgWidth = paddle.width * 1.5 * scaleFactor;
-        const imgHeight = 50 * scaleFactor;
-        const imgX = paddle.x + paddle.width / 2 - imgWidth / 2;
-        const imgY = paddle.y - imgHeight / 2;
-        
-        ctx.save();
-        ctx.globalAlpha = 0.9;
-        ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight);
-        ctx.restore();
-        
-        // Add glow effect
-        ctx.shadowColor = charColor;
-        ctx.shadowBlur = 20;
-        ctx.strokeStyle = charColor;
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = 0.6;
-        ctx.strokeRect(imgX - 5, imgY - 5, imgWidth + 10, imgHeight + 10);
-        ctx.globalAlpha = 1;
-    } else {
-        // Fallback: draw colored rectangle
-        ctx.fillStyle = charColor;
-        ctx.globalAlpha = 0.8;
-        ctx.fillRect(paddle.x, paddle.y - 10, paddle.width * scaleFactor, 20 * scaleFactor);
-        ctx.globalAlpha = 1;
-        
-        ctx.shadowColor = charColor;
-        ctx.shadowBlur = 15;
-    }
-    
-    ctx.shadowColor = 'rgba(0, 0, 0, 0)';
-}
-
     const centerX = paddle.x + paddle.width / 2;
     const centerY = paddle.y;
     const time = gameTime * 0.05;
