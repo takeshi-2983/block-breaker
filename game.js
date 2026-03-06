@@ -174,27 +174,65 @@ const finalScoreDisplay = document.getElementById('finalScore');
 const gameOverTitle = document.getElementById('gameOverTitle');
 
 // Character selection
+function selectCharacter(character) {
+    document.querySelectorAll('.character-option').forEach(o => o.classList.remove('selected'));
+    document.querySelector(`[data-character="${character}"]`).classList.add('selected');
+    selectedCharacter = character;
+    console.log('Selected character:', selectedCharacter);
+}
+
 document.querySelectorAll('.character-option').forEach(option => {
-    option.addEventListener('click', () => {
-        document.querySelectorAll('.character-option').forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
-        selectedCharacter = option.dataset.character;
+    // Click event
+    option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectCharacter(option.dataset.character);
     });
+    
+    // Touch event
+    option.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    
     option.addEventListener('touchend', (e) => {
         e.preventDefault();
-        document.querySelectorAll('.character-option').forEach(o => o.classList.remove('selected'));
-        option.classList.add('selected');
-        selectedCharacter = option.dataset.character;
+        e.stopPropagation();
+        selectCharacter(option.dataset.character);
+    });
+    
+    // Pointer event for better mobile support
+    option.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectCharacter(option.dataset.character);
     });
 });
 
 // Start game from character selection
 if (startCharacterBtn) {
-    startCharacterBtn.addEventListener('click', () => {
+    startCharacterBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Start button clicked with character:', selectedCharacter);
         startGame();
     });
+    
+    startCharacterBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    
     startCharacterBtn.addEventListener('touchend', (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        console.log('Start button touched with character:', selectedCharacter);
+        startGame();
+    });
+    
+    startCharacterBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Start button pointer with character:', selectedCharacter);
         startGame();
     });
 }
